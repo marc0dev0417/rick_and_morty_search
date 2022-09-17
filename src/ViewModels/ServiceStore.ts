@@ -5,6 +5,7 @@ class ServiceStore {
     static serviceStore: ServiceStore
 
     characters: Human[] = []
+    count: number = 1
 
     static getServiceStore() {
         if (this.serviceStore === undefined) {
@@ -17,16 +18,40 @@ class ServiceStore {
         return toJS(this.characters)
     }
 
+    cleanCharacters(){
+        this.characters = []
+    }
+
+    get getCountPage(){
+        return this.count
+    }
+
+    incrementCountPage(){
+        if(this.count < 42){
+        this.count++
+        }
+    }
+
+    decrementCountPage(){
+        if(this.count > 1){
+            this.count--
+        }   
+    }
 
     setCharacters(characters: Human[]) {
         this.characters = characters
     }
 
+
     async requestCharacter(name: string) {
         if (name === '') {
-           this.allCharacters()
-        } else {
-            this.getCharacterByName(name)
+          await this.allCharacters()
+          document.getElementById('container_pagination')!!.style.display = 'block'
+          document.getElementById('container_pagination')!!.style.visibility = 'visible'
+        } else {  
+           await this.getCharacterByName(name)
+            document.getElementById('container_pagination')!!.style.display = 'hidden'
+            document.getElementById('container_pagination')!!.style.visibility = 'hidden'
         }
     }
 
@@ -36,24 +61,45 @@ class ServiceStore {
         })
         if (response.ok) {
             const resultResponse = await response.json()
+            this.cleanCharacters()
             this.setCharacters(resultResponse.results)
         }
     }
+
     async allCharacters(){
         const response = await fetch('https://rickandmortyapi.com/api/character', {
             method: 'GET'
         })
         if (response.ok) {
             const resultResponse = await response.json()
+            this.cleanCharacters()
             this.setCharacters(resultResponse.results)
             console.log(this.getCharacter[1].image)
+        }
+    }
+    async allCharactersByPage(page: number){
+        const response = await fetch(`https://rickandmortyapi.com/api/character/?page=${page}`, {
+            method: 'GET'
+        })
+        if (response.ok) {
+            const resultResponse = await response.json()
+            this.cleanCharacters()
+            this.setCharacters(resultResponse.results)
         }
     }
 
     constructor() {
         makeAutoObservable(this, {
             characters: observable,
+            count: observable,
             requestCharacter: action,
+            allCharacters: action,
+            getCharacterByName: action,
+            allCharactersByPage: action,
+            incrementCountPage: action,
+            decrementCountPage: action,
+            cleanCharacters: action,
+            getCountPage: computed,
             getCharacter: computed
         })
     }

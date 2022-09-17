@@ -4,6 +4,7 @@ import ServiceStore from '../ViewModels/ServiceStore'
 import {observer} from 'mobx-react-lite'
 import { useEffect, useState } from 'react'
 import { Human } from '../Types/Human'
+import Pagination from '../Components/Pagination'
 
 const serviceStore = ServiceStore.getServiceStore()
 
@@ -29,7 +30,7 @@ const Search = () => {
             <div className='flex justify-center items-center flex-wrap gap-4 w-auto'>
             {serviceStore.getCharacter.map((e, i) => <Card key={e.id} image={e.image} name={e.name} species={e.species} gender={e.gender} status={e.status} location={e.location}/>)}
             </div>
-           
+           <Pagination/>
         </>
     )
 }
